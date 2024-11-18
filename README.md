@@ -1,3 +1,23 @@
+# Run Instructions
+
+1. Ensure most recent version of Go is installed on your machine.
+```bash
+go version
+```
+2. Clone the repository to your local machine.
+3. Run compiler
+```bash
+go build
+```
+4. Run executable
+```bash
+./receipt-processor-challenge
+```
+5. Send POST request with your desired receipt example below to localhost:8080.
+6. Calculate points with GET request and ID received from POST in Step #4.
+
+NOTE: I tested within Postman and received the correct amount of points from the examples below.
+
 # Receipt Processor
 
 Build a webservice that fulfils the documented API. The API is described below. A formal definition is provided 
