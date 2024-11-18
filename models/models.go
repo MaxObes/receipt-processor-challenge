@@ -2,17 +2,17 @@ package models
 
 // Receipt represents the structure of a receipt
 type Receipt struct {
-	retailer    string  `json:"retailer"`
-	purchaseDate string `json:"purchaseDate"`
-	purchaseTime string `json:"purchaseTime"`
-	items       []Item  `json:"items"`
-	total       string  `json:"total"`
+	Retailer    string  `json:"retailer"`
+	PurchaseDate string `json:"purchaseDate"`
+	PurchaseTime string `json:"purchaseTime"`
+	Items       []Item  `json:"items"`
+	Total       string  `json:"total"`
 }
 
 // Item represents a single item in the receipt
 type Item struct {
-	shortDescription string  `json:"shortDescription"`
-	price            string  `json:"price"`
+	ShortDescription string  `json:"shortDescription"`
+	Price            string  `json:"price"`
 }
 
 // ReceiptResponse represents the response with the generated ID

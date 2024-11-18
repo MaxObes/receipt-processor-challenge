@@ -7,17 +7,19 @@ import (
 	"github.com/google/uuid"
 	"math"
 	"strconv"
-	"unicode"
 	"time"
+	"fmt"
+	"regexp"
+	"strings"
 )
 
 // local data option
 // initialize a map with a string key (id of receipt)
 // value is a receipt object
-var receipts = make(map[string]Receipt)
+var receipts = make(map[string]models.Receipt)
 
 // calculates the total points for a receipt based on the rules
-func calculatePoints(receipt Receipt) int64 {
+func calculatePoints(receipt models.Receipt) int64 {
 	points := int64(0)
 
 	// Rule 1: 1 point for each alphanumeric characters in retailer name
@@ -42,7 +44,7 @@ func calculatePoints(receipt Receipt) int64 {
 	points += 5 * int64(math.Floor(float64(len(receipt.Items))/2))
 
 	// Rule 5: Points for item descriptions that are multiples of 3 in length
-	for index, item := range receipt.Items {
+	for _, item := range receipt.Items {
 		trimmedDescription := strings.TrimSpace(item.ShortDescription)
 		if len(trimmedDescription)%3 == 0 {
 			price, err := strconv.ParseFloat(item.Price, 64)
@@ -71,7 +73,7 @@ func calculatePoints(receipt Receipt) int64 {
 }
 
 // getPoints handles retrieving points for a receipt by ID
-func getPoints(w http.ResponseWriter, r *http.Request) {
+func GetPoints(w http.ResponseWriter, r *http.Request) {
 	receiptID := strings.TrimPrefix(r.URL.Path, "/receipts/")
 	receiptID = strings.TrimSuffix(receiptID, "/points")
 
@@ -82,11 +84,11 @@ func getPoints(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Calculate points based on receipt total (for simplicity)
-	points := calculatePoints(receipt.Total)
+	points := calculatePoints(receipt)
 
 	// Return the points
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(PointsResponse{Points: points})
+	json.NewEncoder(w).Encode(models.PointsResponse{Points: points})
 }
 
 // counts the number of alphanumeric characters in a string
@@ -96,30 +98,29 @@ func countAlphanumeric(s string) int {
 }
 
 // processReceipt handles receipt processing and generates an ID
-func processReceipt(w http.ResponseWriter, r *http.Request) {
+func ProcessReceipt(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var receipt Receipt
+	var receipt models.Receipt 
 	err := json.NewDecoder(r.Body).Decode(&receipt)
-	// TODO: part of validation add-on
-	// if err != nil || !isValidReceipt(receipt) {
+	
 	if err != nil {
 		http.Error(w, "Invalid receipt data", http.StatusBadRequest)
 		return
 	}
 
 	// Generate a unique ID for the receipt
-	receiptID, nil := generateReceiptID()
+	receiptID, _ := generateReceiptID()
 
 	// Store the receipt in memory
 	receipts[receiptID] = receipt
 
 	// Return the receipt ID in JSON format
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(ReceiptResponse{ID: receiptID})
+	json.NewEncoder(w).Encode(models.ReceiptResponse{ID: receiptID})
 }
 
 // generateReceiptID generates a random UUID ID
@@ -130,11 +131,3 @@ func generateReceiptID() (string, error) {
 	// Return the UUID as a string
 	return id.String(), nil
 }
-
-// TODO: Add validation
-// isValidReceipt checks if the receipt has valid data
-// func isValidReceipt(receipt Receipt) bool {
-// 	// Add validation checks for fields as needed
-// 	return receipt.Retailer != "" && receipt.PurchaseDate != "" && receipt.PurchaseTime != "" && len(receipt.Items) > 0 && receipt.Total != ""
-// }
-

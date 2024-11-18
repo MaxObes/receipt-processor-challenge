@@ -8,8 +8,8 @@ import (
 
 func main() {
 	//api endpoints
-	http.HandleFunc("/receipts/process", processReceipt)
-	http.HandleFunc("/receipts/", getPoints)
+	http.HandleFunc("/receipts/process", handler.ProcessReceipt)
+	http.HandleFunc("/receipts/", handler.GetPoints)
 
 	// Start the server
 	var port string = "8080"
