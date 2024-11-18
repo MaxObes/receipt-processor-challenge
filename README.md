@@ -13,7 +13,7 @@ go build
 ```bash
 ./receipt-processor-challenge
 ```
-5. Send POST request with your desired receipt example below.
+5. Send POST request with your desired receipt example below to localhost:8080.
 6. Calculate points with GET request and ID received from POST in Step #4.
 
 NOTE: I tested within Postman and received the correct amount of points from the examples below.
